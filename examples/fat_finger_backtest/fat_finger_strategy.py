@@ -69,9 +69,10 @@ class FatFingerStrategy(CtaTemplate):
     n_revert_close = 0
     n_timeout_close = 0
 
+    # variables 仅放需重启恢复的交易状态。运行统计计数(n_*)不入 variables——否则
+    # CtaEngine 持久化会在每次重启时恢复旧值再累加，造成计数虚高（实盘前仿真已验证）。
     variables = [
         "state", "quote_mid", "fill_price", "fill_mid", "daily_realized_pnl",
-        "n_quote", "n_fill", "n_stop_close", "n_revert_close", "n_timeout_close",
     ]
 
     def __init__(self, cta_engine, strategy_name, vt_symbol, setting):
@@ -88,6 +89,9 @@ class FatFingerStrategy(CtaTemplate):
         self.session_closing = False   # 本 session 已进入收盘撤单期
         self.closing = False           # 已发平仓单，等待成交
         self.closing_dt: datetime | None = None  # 平仓单挂出时刻，用于超时重发
+        # 活动委托集合：实盘撤单异步回报，靠它确保"撤完再挂"，避免双挂单超买
+        self.active_orderids: set[str] = set()
+        self.trade_log: list[tuple] = []   # 观测：每次成交回报 (tradeid, dir, offset, price)
 
     # ---------------- 生命周期 ----------------
     def on_init(self):
@@ -180,9 +184,11 @@ class FatFingerStrategy(CtaTemplate):
             return
         if self.quote_mid > 0:
             drift = abs(mid - self.quote_mid) / self.quote_mid
-            if drift > self.drift_pct:              # mid 漂移：撤旧挂新
-                self.cancel_all()
-                self._place_quote(tick, mid)        # 仍 QUOTING
+            if drift > self.drift_pct:              # mid 漂移：先撤旧单，撤完(active 空)再挂新
+                if self.active_orderids:
+                    self.cancel_all()               # 撤旧单（实盘异步），本 tick 不挂新
+                else:
+                    self._place_quote(tick, mid)    # 旧单已离场，挂新单（仍 QUOTING）
 
     def _on_filled(self, tick: TickData, mid: float):
         if self.closing:
@@ -221,6 +227,8 @@ class FatFingerStrategy(CtaTemplate):
 
     # ---------------- 下单 ----------------
     def _place_quote(self, tick: TickData, mid: float) -> bool:
+        if self.active_orderids:
+            return False                            # 仍有活动委托未离场，绝不重复挂（防双挂单）
         raw = mid * (1 - self.x_pct)
         price = math.floor(raw / self.price_tick) * self.price_tick  # 向下取整不抬价
         if price <= 0 or price >= tick.ask_price_1:
@@ -240,6 +248,9 @@ class FatFingerStrategy(CtaTemplate):
 
     # ---------------- 回调 ----------------
     def on_trade(self, trade: TradeData):
+        self.trade_log.append(
+            (trade.vt_tradeid, trade.direction.value, trade.offset.value, trade.price)
+        )
         if trade.direction == Direction.LONG:       # 买入开仓成交
             self.cancel_all()                       # 成交即撤其它未成交单
             self.fill_price = trade.price
@@ -259,7 +270,11 @@ class FatFingerStrategy(CtaTemplate):
                 self.state = int(FFState.COOLDOWN)
 
     def on_order(self, order: OrderData):
-        pass
+        # 跟踪活动委托：实盘下单/撤单/成交回报异步到达，据此判断旧单是否真已离场
+        if order.is_active():
+            self.active_orderids.add(order.vt_orderid)
+        else:
+            self.active_orderids.discard(order.vt_orderid)
 
     # ---------------- 工具 ----------------
     def _floating(self, mid: float) -> float:

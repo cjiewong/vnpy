@@ -99,6 +99,29 @@ $PY portfolio_demo.py
 3. **远月清淡**：离到期远的合约盘口常空、spread 宽，挂单/成交都稀疏，属正常现象。
 4. **首轮区间** 2025 Q2 避开 2026-04 末端数据残缺区。
 
+## 实盘前仿真（第一层，mac 可跑）
+
+`replay_gateway.py` + `run_live_sim.py`：在 vnpy **实盘引擎栈**(EventEngine+MainEngine+
+CtaEngine)上用历史 tick 回放驱动策略，订单/成交/撤单走 **CTP 异步回报语义**
+(SUBMITTING→NOTTRADED→ALLTRADED，撤单回报延迟，成交延迟一 tick)，验证策略从回测的
+同步撮合迁移到实盘异步环境是否健壮。
+
+```bash
+$PY run_live_sim.py            # 默认 TA2509 2025-04-10（一个真实乌龙日）
+```
+
+健壮性判据：末持仓=0 且 在途订单峰值≤1（无双挂单）。本仿真暴露并修复了两个回测掩盖的
+真实问题：
+
+1. **双挂单**：漂移重挂时 `cancel_all()` 后立即挂新单——回测同步撤单即时生效没事，
+   实盘异步撤单有延迟，旧单未离场新单已挂出，两个买单同时在场可能超买。
+   修复：策略层用 `active_orderids` 跟踪活动委托，**撤完(active 空)再挂**。
+2. **统计计数持久化累积**：`n_fill` 等运行统计原放进 `variables`，被 CtaEngine 持久化，
+   每次重启恢复旧值再累加致虚高。修复：`variables` 只留需重启恢复的交易状态
+   (state/quote_mid/fill_price/fill_mid/daily_realized_pnl)，统计计数移出。
+
+> 第二层（NAS x86_64 Docker 跑 vnpy_ctp 连 SimNow 真实模拟柜台）见任务进度，需 SimNow 账号。
+
 ## 回测结果
 
 见 `RESULTS.md`（由 `run_backtest.py` 产出后整理）。
