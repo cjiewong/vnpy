@@ -1,0 +1,8 @@
+# 防御性忽略：密码文件绝不进 vnpy 仓库
+secrets.toml
+*.secret
+# 回测产物与缓存
+__pycache__/
+*.pyc
+*.csv
+*.parquet
