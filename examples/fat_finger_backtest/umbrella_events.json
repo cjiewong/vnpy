@@ -1,0 +1,140 @@
+[
+ {
+  "instrument": "FG2308",
+  "date": "2023-04-20",
+  "product": "FG",
+  "dev": -4.44
+ },
+ {
+  "instrument": "MA2307",
+  "date": "2023-05-26",
+  "product": "MA",
+  "dev": -4.19
+ },
+ {
+  "instrument": "FG2405",
+  "date": "2023-06-02",
+  "product": "FG",
+  "dev": -4.88
+ },
+ {
+  "instrument": "FG2311",
+  "date": "2023-08-21",
+  "product": "FG",
+  "dev": -4.76
+ },
+ {
+  "instrument": "FG2403",
+  "date": "2023-08-21",
+  "product": "FG",
+  "dev": -4.27
+ },
+ {
+  "instrument": "FG2310",
+  "date": "2023-08-21",
+  "product": "FG",
+  "dev": -6.43
+ },
+ {
+  "instrument": "FG2310",
+  "date": "2023-09-01",
+  "product": "FG",
+  "dev": -4.1
+ },
+ {
+  "instrument": "FG2405",
+  "date": "2024-01-03",
+  "product": "FG",
+  "dev": -4.33
+ },
+ {
+  "instrument": "FG2503",
+  "date": "2024-10-08",
+  "product": "FG",
+  "dev": -6.26
+ },
+ {
+  "instrument": "FG2505",
+  "date": "2024-10-08",
+  "product": "FG",
+  "dev": -5.76
+ },
+ {
+  "instrument": "FG2411",
+  "date": "2024-10-08",
+  "product": "FG",
+  "dev": -7.88
+ },
+ {
+  "instrument": "FG2412",
+  "date": "2024-10-08",
+  "product": "FG",
+  "dev": -6.01
+ },
+ {
+  "instrument": "FG2412",
+  "date": "2024-10-14",
+  "product": "FG",
+  "dev": -4.41
+ },
+ {
+  "instrument": "FG2502",
+  "date": "2024-10-14",
+  "product": "FG",
+  "dev": -4.15
+ },
+ {
+  "instrument": "RM2501",
+  "date": "2024-11-07",
+  "product": "RM",
+  "dev": -4.25
+ },
+ {
+  "instrument": "TA2509",
+  "date": "2025-04-10",
+  "product": "TA",
+  "dev": -4.1
+ },
+ {
+  "instrument": "TA2508",
+  "date": "2025-05-12",
+  "product": "TA",
+  "dev": -4.46
+ },
+ {
+  "instrument": "MA2508",
+  "date": "2025-06-13",
+  "product": "MA",
+  "dev": -4.37
+ },
+ {
+  "instrument": "FG2510",
+  "date": "2025-07-10",
+  "product": "FG",
+  "dev": -4.63
+ },
+ {
+  "instrument": "FG2511",
+  "date": "2025-07-10",
+  "product": "FG",
+  "dev": -4.14
+ },
+ {
+  "instrument": "FG2511",
+  "date": "2025-07-24",
+  "product": "FG",
+  "dev": -5.88
+ },
+ {
+  "instrument": "FG2605",
+  "date": "2025-07-24",
+  "product": "FG",
+  "dev": -6.81
+ },
+ {
+  "instrument": "RM2509",
+  "date": "2025-08-12",
+  "product": "RM",
+  "dev": -4.2
+ }
+]

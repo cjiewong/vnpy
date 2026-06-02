@@ -59,6 +59,9 @@ $PY run_backtest.py --products RM,MA,TA --start 2025-04-01 --end 2025-06-30 --pr
 
 # 真实乌龙捕捉对比：ask1 官方口径 vs avg_fill 口径（见 RESULTS.md 第二节）
 $PY capture_demo.py
+
+# 组合层风控验证：23 个真实乌龙归并，验证"最多1持仓+单日1000"（见 RESULTS.md 第四节）
+$PY portfolio_demo.py
 ```
 
 `run_single(..., fill_proxy=True)` 切换到 avg_fill 撮合口径——用 turnover/volume 增量
